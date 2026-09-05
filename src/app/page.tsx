@@ -42,7 +42,7 @@ export default function HomePage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--accent))] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--accent))]" />
               </span>
-              Available for DevOps / Platform roles
+              Open to new opportunities
             </div>
           </FadeIn>
 

@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "Anish Kumar",
-  role: "Backend Engineer → DevOps / MLOps",
+  role: "Backend Engineer → DevOps",
   tagline:
-    "Java backend engineer building resilient microservices with Spring Boot, Kafka & AWS — now leaning into DevOps and MLOps.",
+    "Java backend engineer building resilient microservices with Spring Boot, React and AWS — leaning into DevOps with Terraform.",
   url: "https://anishkumar.dev",
   ogImage: "/og.png",
   email: "kanish92729@gmail.com",
