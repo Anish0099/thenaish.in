@@ -3,7 +3,7 @@ export const siteConfig = {
   role: "Backend Engineer → DevOps",
   tagline:
     "Java backend engineer building resilient microservices with Spring Boot, React and AWS — leaning into DevOps with Terraform.",
-  url: "https://thenaish.in",
+  url: "https://theanish.in",
   ogImage: "/og.png",
   email: "kanish92729@gmail.com",
   location: "India",
