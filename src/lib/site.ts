@@ -3,13 +3,13 @@ export const siteConfig = {
   role: "Backend Engineer → DevOps",
   tagline:
     "Java backend engineer building resilient microservices with Spring Boot, React and AWS — leaning into DevOps with Terraform.",
-  url: "https://anishkumar.dev",
+  url: "https://thenaish.in",
   ogImage: "/og.png",
   email: "kanish92729@gmail.com",
   location: "India",
   links: {
-    github: "https://github.com/anishkumar",
-    linkedin: "https://www.linkedin.com/in/anishkumar",
+    github: "https://github.com/anish0099",
+    linkedin: "https://www.linkedin.com/in/anish-kumar-119a761bb",
     resume: "/resume.pdf",
   },
   nav: [
