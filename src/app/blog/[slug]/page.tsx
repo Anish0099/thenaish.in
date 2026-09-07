@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Mdx } from "@/components/mdx";
+import { PortableText } from "@/components/portable-text";
 import { JsonLd, blogPostingJsonLd } from "@/components/json-ld";
 import { getAllPosts, getPost } from "@/lib/content";
 import { siteConfig } from "@/lib/site";
@@ -22,21 +22,21 @@ export async function generateMetadata(
   if (!post) return {};
   const url = `${siteConfig.url}/blog/${post.slug}`;
   return {
-    title: post.frontmatter.title,
-    description: post.frontmatter.description,
+    title: post.title,
+    description: post.description,
     alternates: { canonical: url },
     openGraph: {
-      title: post.frontmatter.title,
-      description: post.frontmatter.description,
+      title: post.title,
+      description: post.description,
       url,
       type: "article",
-      publishedTime: post.frontmatter.date,
-      tags: post.frontmatter.tags,
+      publishedTime: post.publishedAt,
+      tags: post.tags,
     },
     twitter: {
       card: "summary_large_image",
-      title: post.frontmatter.title,
-      description: post.frontmatter.description,
+      title: post.title,
+      description: post.description,
     },
   };
 }
@@ -50,11 +50,11 @@ export default async function BlogPost(props: PageProps<"/blog/[slug]">) {
     <article className="mx-auto w-full max-w-3xl px-6 py-16">
       <JsonLd
         data={blogPostingJsonLd({
-          title: post.frontmatter.title,
-          description: post.frontmatter.description,
+          title: post.title,
+          description: post.description,
           slug: post.slug,
-          date: post.frontmatter.date,
-          tags: post.frontmatter.tags,
+          date: post.publishedAt,
+          tags: post.tags,
         })}
       />
       <Link
@@ -66,30 +66,30 @@ export default async function BlogPost(props: PageProps<"/blog/[slug]">) {
 
       <header className="mb-10">
         <div className="flex items-center gap-3 font-mono text-xs text-[hsl(var(--muted-foreground))]">
-          <time dateTime={post.frontmatter.date}>
-            {formatDate(post.frontmatter.date)}
-          </time>
+          <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
           <span>·</span>
           <span>{post.readingTime}</span>
         </div>
         <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          {post.frontmatter.title}
+          {post.title}
         </h1>
         <p className="mt-4 text-lg text-[hsl(var(--muted-foreground))]">
-          {post.frontmatter.description}
+          {post.description}
         </p>
-        {post.frontmatter.tags?.length ? (
+        {post.tags?.length ? (
           <div className="mt-6 flex flex-wrap gap-2">
-            {post.frontmatter.tags.map((tag) => (
+            {post.tags.map((tag) => (
               <Badge key={tag}>{tag}</Badge>
             ))}
           </div>
         ) : null}
       </header>
 
-      <div className="prose-content">
-        <Mdx source={post.content} />
-      </div>
+      {post.body ? (
+        <div className="prose-content">
+          <PortableText value={post.body} />
+        </div>
+      ) : null}
     </article>
   );
 }

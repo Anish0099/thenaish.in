@@ -14,9 +14,7 @@ export default async function HomePage() {
     getAllProjects(),
     getAllPosts(),
   ]);
-  const featuredProjects = projects
-    .filter((p) => p.frontmatter.featured !== false)
-    .slice(0, 4);
+  const featuredProjects = projects.filter((p) => p.featured).slice(0, 4);
   const latestPosts = posts.slice(0, 3);
 
   return (
@@ -72,112 +70,112 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured projects */}
-      <section className="border-t border-[hsl(var(--border))]">
-        <div className="mx-auto w-full max-w-5xl px-6 py-20">
-          <FadeIn>
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[hsl(var(--accent))]">
-                  Selected work
-                </p>
-                <h2 className="text-3xl font-semibold tracking-tight">
-                  Featured projects
-                </h2>
-              </div>
-              <Link
-                href="/projects"
-                className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] sm:inline-flex"
-              >
-                All projects <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </FadeIn>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            {featuredProjects.map((project, i) => (
-              <FadeIn key={project.slug} delay={i * 0.08}>
+      {featuredProjects.length > 0 ? (
+        <section className="border-t border-[hsl(var(--border))]">
+          <div className="mx-auto w-full max-w-5xl px-6 py-20">
+            <FadeIn>
+              <div className="mb-10 flex items-end justify-between gap-4">
+                <div>
+                  <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[hsl(var(--accent))]">
+                    Selected work
+                  </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">
+                    Featured projects
+                  </h2>
+                </div>
                 <Link
-                  href={`/projects/${project.slug}`}
-                  className="group block h-full"
+                  href="/projects"
+                  className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] sm:inline-flex"
                 >
-                  <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:border-[hsl(var(--accent))]/50">
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4">
-                        <CardTitle className="group-hover:text-[hsl(var(--accent))]">
-                          {project.frontmatter.title}
-                        </CardTitle>
-                        <ArrowUpRight className="h-4 w-4 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--accent))]" />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-                        {project.frontmatter.summary}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.frontmatter.stack.slice(0, 5).map((tech) => (
-                          <Badge key={tech}>{tech}</Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                  All projects <ArrowUpRight className="h-4 w-4" />
                 </Link>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Latest posts */}
-      <section className="border-t border-[hsl(var(--border))]">
-        <div className="mx-auto w-full max-w-5xl px-6 py-20">
-          <FadeIn>
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[hsl(var(--accent))]">
-                  Writing
-                </p>
-                <h2 className="text-3xl font-semibold tracking-tight">
-                  Latest posts
-                </h2>
               </div>
-              <Link
-                href="/blog"
-                className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] sm:inline-flex"
-              >
-                All posts <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </FadeIn>
+            </FadeIn>
 
-          <ul className="divide-y divide-[hsl(var(--border))] border-y border-[hsl(var(--border))]">
-            {latestPosts.map((post, i) => (
-              <FadeIn key={post.slug} delay={i * 0.05}>
-                <li>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {featuredProjects.map((project, i) => (
+                <FadeIn key={project.slug} delay={i * 0.08}>
                   <Link
-                    href={`/blog/${post.slug}`}
-                    className="group flex flex-col gap-2 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+                    href={`/projects/${project.slug}`}
+                    className="group block h-full"
                   >
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium transition-colors group-hover:text-[hsl(var(--accent))]">
-                        {post.frontmatter.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-                        {post.frontmatter.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 font-mono text-xs text-[hsl(var(--muted-foreground))]">
-                      <time>{formatDate(post.frontmatter.date)}</time>
-                      <span>·</span>
-                      <span>{post.readingTime}</span>
-                    </div>
+                    <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:border-[hsl(var(--accent))]/50">
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-4">
+                          <CardTitle className="group-hover:text-[hsl(var(--accent))]">
+                            {project.title}
+                          </CardTitle>
+                          <ArrowUpRight className="h-4 w-4 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--accent))]" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+                          {project.summary}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {(project.stack ?? []).slice(0, 5).map((tech) => (
+                            <Badge key={tech}>{tech}</Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </Link>
-                </li>
-              </FadeIn>
-            ))}
-          </ul>
-        </div>
-      </section>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {latestPosts.length > 0 ? (
+        <section className="border-t border-[hsl(var(--border))]">
+          <div className="mx-auto w-full max-w-5xl px-6 py-20">
+            <FadeIn>
+              <div className="mb-10 flex items-end justify-between gap-4">
+                <div>
+                  <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[hsl(var(--accent))]">
+                    Writing
+                  </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">
+                    Latest posts
+                  </h2>
+                </div>
+                <Link
+                  href="/blog"
+                  className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] sm:inline-flex"
+                >
+                  All posts <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </FadeIn>
+
+            <ul className="divide-y divide-[hsl(var(--border))] border-y border-[hsl(var(--border))]">
+              {latestPosts.map((post, i) => (
+                <FadeIn key={post.slug} delay={i * 0.05}>
+                  <li>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="group flex flex-col gap-2 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+                    >
+                      <div className="flex-1">
+                        <h3 className="text-lg font-medium transition-colors group-hover:text-[hsl(var(--accent))]">
+                          {post.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+                          {post.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 font-mono text-xs text-[hsl(var(--muted-foreground))]">
+                        <time>{formatDate(post.publishedAt)}</time>
+                      </div>
+                    </Link>
+                  </li>
+                </FadeIn>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

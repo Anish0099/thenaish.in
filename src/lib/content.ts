@@ -1,19 +1,31 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
+import "server-only";
 import readingTime from "reading-time";
+import type { PortableTextBlock } from "@portabletext/react";
+import { client } from "@/sanity/client";
+import { isConfigured as SANITY_CONFIGURED } from "@/sanity/env";
+import {
+  postBySlugQuery,
+  postsQuery,
+  projectBySlugQuery,
+  projectsQuery,
+} from "@/sanity/queries";
+import { portableTextToPlain } from "@/components/portable-text";
 
-const CONTENT_ROOT = path.join(process.cwd(), "src", "content");
-
-export type PostFrontmatter = {
+export type PostSummary = {
+  slug: string;
   title: string;
   description: string;
-  date: string;
+  publishedAt: string;
   tags?: string[];
-  published?: boolean;
 };
 
-export type ProjectFrontmatter = {
+export type Post = PostSummary & {
+  body?: PortableTextBlock[];
+  readingTime: string;
+};
+
+export type ProjectSummary = {
+  slug: string;
   title: string;
   summary: string;
   stack: string[];
@@ -24,68 +36,39 @@ export type ProjectFrontmatter = {
   demo?: string;
 };
 
-export type Post = {
-  slug: string;
-  frontmatter: PostFrontmatter;
-  content: string;
-  readingTime: string;
+export type Project = ProjectSummary & {
+  body?: PortableTextBlock[];
 };
 
-export type Project = {
-  slug: string;
-  frontmatter: ProjectFrontmatter;
-  content: string;
-};
-
-async function readCollection(dir: string): Promise<
-  Array<{ slug: string; raw: string; source: string }>
-> {
-  const full = path.join(CONTENT_ROOT, dir);
-  const entries = await fs.readdir(full).catch(() => [] as string[]);
-  const files = entries.filter((f) => f.endsWith(".mdx"));
-  return Promise.all(
-    files.map(async (file) => {
-      const source = await fs.readFile(path.join(full, file), "utf8");
-      return { slug: file.replace(/\.mdx$/, ""), raw: file, source };
-    })
-  );
-}
-
-export async function getAllPosts(): Promise<Post[]> {
-  const items = await readCollection("posts");
-  const posts = items.map(({ slug, source }) => {
-    const { data, content } = matter(source);
-    return {
-      slug,
-      frontmatter: data as PostFrontmatter,
-      content,
-      readingTime: readingTime(content).text,
-    };
-  });
-  return posts
-    .filter((p) => p.frontmatter.published !== false)
-    .sort(
-      (a, b) =>
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime()
-    );
+export async function getAllPosts(): Promise<PostSummary[]> {
+  if (!SANITY_CONFIGURED) return [];
+  return client.fetch<PostSummary[]>(postsQuery, {}, { next: { revalidate: 60 } });
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
-  const posts = await getAllPosts();
-  return posts.find((p) => p.slug === slug) ?? null;
+  if (!SANITY_CONFIGURED) return null;
+  const raw = await client.fetch<
+    (PostSummary & { body?: PortableTextBlock[] }) | null
+  >(postBySlugQuery, { slug }, { next: { revalidate: 60 } });
+  if (!raw) return null;
+  const plain = portableTextToPlain(raw.body);
+  return { ...raw, readingTime: readingTime(plain).text };
 }
 
-export async function getAllProjects(): Promise<Project[]> {
-  const items = await readCollection("projects");
-  const projects = items.map(({ slug, source }) => {
-    const { data, content } = matter(source);
-    return { slug, frontmatter: data as ProjectFrontmatter, content };
-  });
-  return projects.sort((a, b) => a.frontmatter.title.localeCompare(b.frontmatter.title));
+export async function getAllProjects(): Promise<ProjectSummary[]> {
+  if (!SANITY_CONFIGURED) return [];
+  return client.fetch<ProjectSummary[]>(projectsQuery, {}, { next: { revalidate: 60 } });
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
-  const items = await getAllProjects();
-  return items.find((p) => p.slug === slug) ?? null;
+  if (!SANITY_CONFIGURED) return null;
+  return client.fetch<Project | null>(
+    projectBySlugQuery,
+    { slug },
+    { next: { revalidate: 60 } }
+  );
+}
+
+export function isSanityConfigured() {
+  return SANITY_CONFIGURED;
 }

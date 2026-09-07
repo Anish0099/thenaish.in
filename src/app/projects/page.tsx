@@ -30,37 +30,49 @@ export default async function ProjectsPage() {
         </p>
       </FadeIn>
 
-      <div className="mt-12 grid gap-6 sm:grid-cols-2">
-        {projects.map((project, i) => (
-          <FadeIn key={project.slug} delay={i * 0.06}>
-            <Link
-              href={`/projects/${project.slug}`}
-              className="group block h-full"
-            >
-              <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:border-[hsl(var(--accent))]/50">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <CardTitle className="group-hover:text-[hsl(var(--accent))]">
-                      {project.frontmatter.title}
-                    </CardTitle>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--accent))]" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-                    {project.frontmatter.summary}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.frontmatter.stack.slice(0, 5).map((tech) => (
-                      <Badge key={tech}>{tech}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+      {projects.length === 0 ? (
+        <FadeIn delay={0.05}>
+          <p className="mt-12 rounded-lg border border-dashed border-[hsl(var(--border))] p-8 text-center text-[hsl(var(--muted-foreground))]">
+            No projects yet — add one from{" "}
+            <Link href="/studio" className="text-[hsl(var(--accent))] underline-offset-4 hover:underline">
+              Studio
             </Link>
-          </FadeIn>
-        ))}
-      </div>
+            .
+          </p>
+        </FadeIn>
+      ) : (
+        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+          {projects.map((project, i) => (
+            <FadeIn key={project.slug} delay={i * 0.06}>
+              <Link
+                href={`/projects/${project.slug}`}
+                className="group block h-full"
+              >
+                <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:border-[hsl(var(--accent))]/50">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-4">
+                      <CardTitle className="group-hover:text-[hsl(var(--accent))]">
+                        {project.title}
+                      </CardTitle>
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--accent))]" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+                      {project.summary}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(project.stack ?? []).slice(0, 5).map((tech) => (
+                        <Badge key={tech}>{tech}</Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            </FadeIn>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

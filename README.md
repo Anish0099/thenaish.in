@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+Personal portfolio and blog for Anish Kumar. Next.js 16 (App Router),
+TypeScript, Tailwind, shadcn-style primitives, Framer Motion, and Sanity
+CMS for authoring content directly from the browser.
 
-First, run the development server:
+## First-time setup (one-off, ~5 minutes)
+
+The site reads its blog posts and projects from Sanity, so you need to
+create a free Sanity project once. After that, every new post is written
+in the browser at `/studio`.
+
+### 1. Create a Sanity project
+
+1. Go to <https://www.sanity.io/manage> and sign in with Google or GitHub.
+2. Click **Create new project**. Give it any name (e.g. "Portfolio").
+3. When it asks for a dataset, keep the default (`production`).
+4. Copy the **Project ID** from the project's dashboard.
+
+### 2. Wire up local env
+
+Copy the example env file and paste your project id:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then edit `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id-here
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2025-01-01
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Add your domain to Sanity CORS
 
-## Learn More
+Sanity blocks unknown origins by default. On <https://www.sanity.io/manage>:
 
-To learn more about Next.js, take a look at the following resources:
+1. Open your project → **API** tab → **CORS origins** → **Add CORS origin**.
+2. Add `http://localhost:3000` (credentials: allow) for local dev.
+3. Once deployed, add your production URL too (e.g. `https://anishkumar.dev`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Run the dev server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Open <http://localhost:3000> for the site and <http://localhost:3000/studio>
+for the CMS. Log into Studio with the same account you used to create the
+Sanity project.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Writing content
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/studio` → the CMS. Publish a post there and it appears on `/blog`
+  within a minute (ISR revalidates in the background). Same for projects.
+- The site fetches from Sanity's CDN, so reads are fast globally.
+- The old MDX files under `src/content/` are kept in the repo as a
+  backup but are no longer read by the site.
+
+## Deploy to Vercel
+
+1. Push this repo to GitHub.
+2. Import it at <https://vercel.com/new>.
+3. In Vercel's project settings, add the three env vars from `.env.local`.
+4. Deploy. Add the Vercel URL to Sanity CORS origins.
+5. (Optional) Wire a Sanity webhook to a Vercel Deploy Hook so a
+   published post triggers a rebuild instantly instead of waiting for
+   ISR: <https://www.sanity.io/docs/webhooks>.
+
+## Scripts
+
+```bash
+npm run dev       # dev server at :3000
+npm run build     # production build
+npm run start     # start built server
+npm run lint      # ESLint
+```
+
+## Structure
+
+```
+src/
+  app/                    Next.js App Router routes
+    studio/[[...tool]]    Sanity Studio CMS (auth-gated)
+  components/             UI + PortableText renderers
+  content/                Legacy MDX (unused; kept as backup)
+  lib/                    site config, content loader, shiki
+  sanity/                 client, env, schemas, GROQ queries
+sanity.config.ts          Studio config (schemas, plugins)
+```
