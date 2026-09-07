@@ -4,32 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/fade-in";
+import { GithubIcon } from "@/components/icons";
 import { siteConfig } from "@/lib/site";
+import { getAllPosts, getAllProjects } from "@/lib/content";
+import { formatDate } from "@/lib/utils";
 
-const featuredProjects = [
-  {
-    slug: "ai-fitness-app",
-    title: "AI Fitness App",
-    summary:
-      "Event-driven fitness coach built on Spring Boot microservices, Kafka and a React client — with an AI service that generates personalized workout plans.",
-    stack: ["Spring Boot", "Kafka", "React", "PostgreSQL", "Docker"],
-    href: "/projects/ai-fitness-app",
-    repo: "https://github.com/anishkumar/ai-fitness-app",
-  },
-];
+export default async function HomePage() {
+  const [projects, posts] = await Promise.all([
+    getAllProjects(),
+    getAllPosts(),
+  ]);
+  const featuredProjects = projects
+    .filter((p) => p.frontmatter.featured !== false)
+    .slice(0, 4);
+  const latestPosts = posts.slice(0, 3);
 
-const latestPosts = [
-  {
-    slug: "hello-world",
-    title: "From Backend to DevOps: Why I'm Making the Jump",
-    date: "2026-01-14",
-    readingTime: "4 min read",
-    summary:
-      "Six years shipping Java microservices taught me that the interesting problems live at the boundary between code and infrastructure. Here's what I'm learning next.",
-  },
-];
-
-export default function HomePage() {
   return (
     <>
       {/* Hero */}
@@ -75,15 +64,7 @@ export default function HomePage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-1.9c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.28 1.19-3.09-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.77.11 3.06.74.81 1.19 1.83 1.19 3.09 0 4.43-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .3.21.66.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-                  </svg>{" "}
-                  GitHub
+                  <GithubIcon className="h-4 w-4" /> GitHub
                 </Link>
               </Button>
             </div>
@@ -116,22 +97,25 @@ export default function HomePage() {
           <div className="grid gap-6 sm:grid-cols-2">
             {featuredProjects.map((project, i) => (
               <FadeIn key={project.slug} delay={i * 0.08}>
-                <Link href={project.href} className="group block h-full">
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="group block h-full"
+                >
                   <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:border-[hsl(var(--accent))]/50">
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4">
                         <CardTitle className="group-hover:text-[hsl(var(--accent))]">
-                          {project.title}
+                          {project.frontmatter.title}
                         </CardTitle>
                         <ArrowUpRight className="h-4 w-4 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--accent))]" />
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-                        {project.summary}
+                        {project.frontmatter.summary}
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {project.stack.map((tech) => (
+                        {project.frontmatter.stack.slice(0, 5).map((tech) => (
                           <Badge key={tech}>{tech}</Badge>
                         ))}
                       </div>
@@ -176,14 +160,14 @@ export default function HomePage() {
                   >
                     <div className="flex-1">
                       <h3 className="text-lg font-medium transition-colors group-hover:text-[hsl(var(--accent))]">
-                        {post.title}
+                        {post.frontmatter.title}
                       </h3>
                       <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-                        {post.summary}
+                        {post.frontmatter.description}
                       </p>
                     </div>
                     <div className="flex items-center gap-3 font-mono text-xs text-[hsl(var(--muted-foreground))]">
-                      <time>{post.date}</time>
+                      <time>{formatDate(post.frontmatter.date)}</time>
                       <span>·</span>
                       <span>{post.readingTime}</span>
                     </div>

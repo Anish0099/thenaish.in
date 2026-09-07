@@ -1,0 +1,55 @@
+---
+title: "AI Fitness App"
+summary: "Event-driven fitness coach built on Spring Boot microservices, Kafka and a React client — with an AI service that generates personalized workout plans."
+stack: ["Spring Boot", "Kafka", "React", "PostgreSQL", "Docker", "AWS"]
+role: "Solo build — backend, infra, and client"
+period: "2025"
+featured: true
+github: "https://github.com/anishkumar/ai-fitness-app"
+demo: ""
+---
+
+## The problem
+
+Off-the-shelf fitness apps hand out the same plan to everyone. I wanted a system
+that could observe a user's actual training history — completed sessions, RPE,
+soreness reports — and generate the next week's plan in response, without a
+human coach in the loop.
+
+## Architecture
+
+Four Spring Boot services talk over Kafka, with PostgreSQL for persistence and
+Redis for hot session state:
+
+- **`user-service`** — authentication, profile, goals. Publishes `user.updated`.
+- **`workout-service`** — tracks completed sessions and RPE. Publishes
+  `workout.completed`.
+- **`ai-service`** — consumes both streams, calls the LLM to produce the next
+  block, writes a `plan.generated` event back.
+- **`gateway`** — Spring Cloud Gateway in front, terminates auth and does
+  fan-out to the React client via SSE.
+
+```java
+@KafkaListener(topics = "workout.completed", groupId = "ai-service")
+public void onWorkoutCompleted(WorkoutCompletedEvent event) {
+    var history = workoutHistory.forUser(event.userId(), Duration.ofDays(28));
+    var plan = planner.generate(history, userGoals.forUser(event.userId()));
+    plans.save(plan);
+    kafka.send("plan.generated", new PlanGeneratedEvent(event.userId(), plan.id()));
+}
+```
+
+## What I learned
+
+- **Event-first pays off later.** Adding a "weekly summary email" was a new
+  consumer on the existing streams — zero changes to the producers.
+- **Idempotency is not free.** Every consumer needed a dedupe key; I settled on
+  `(topic, userId, eventId)` in Redis with a 24h TTL.
+- **The AI call is the bottleneck.** Batching plan generation to run when the
+  user is asleep in their timezone cut LLM cost by ~60% with no UX hit.
+
+## Tech stack
+
+Java 21, Spring Boot 3.3, Spring Cloud Gateway, Apache Kafka, PostgreSQL 16,
+Redis 7, React 18 with Vite, Docker Compose for local, Terraform-managed ECS
+Fargate for production.

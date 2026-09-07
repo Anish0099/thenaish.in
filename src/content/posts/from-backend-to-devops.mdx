@@ -1,0 +1,56 @@
+---
+title: "From Backend to DevOps: Why I'm Making the Jump"
+description: "Six years shipping Java microservices taught me the interesting problems live at the boundary between code and infrastructure. Here's what I'm learning next."
+date: "2026-01-14"
+tags: ["career", "devops", "terraform"]
+published: true
+---
+
+Six years ago I wrote my first `@RestController`. It returned a `Map<String, String>`
+and I thought I'd made it. Since then I've shipped enough Spring Boot services to
+know that the interesting problems aren't in the controller — they're in the
+five layers below it, where code meets machine.
+
+## The shift
+
+Every backend engineer I know has slowly become a part-time platform engineer.
+You write the service, then you write the Dockerfile. You write the Dockerfile,
+then you argue with the Helm chart. You argue with the Helm chart, then you
+find yourself in `main.tf` at 11pm on a Tuesday.
+
+At some point the "part-time" stops being accurate.
+
+## What I'm actually learning
+
+I'm treating this like any other codebase — read the docs, build small things,
+break them, fix them.
+
+```hcl
+resource "aws_ecs_service" "api" {
+  name            = "api"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.api.arn
+  desired_count   = 2
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+}
+```
+
+That `deployment_circuit_breaker` block is the kind of thing I would have
+skipped past a year ago. Now I know it's the reason a bad deploy at 3am doesn't
+turn into an incident at 3:15.
+
+## The list
+
+Concretely, over the next few months:
+
+1. **Terraform in anger** — modules, remote state on S3, drift detection.
+2. **Observability** — OpenTelemetry from the app, Prometheus + Grafana below it.
+3. **Kubernetes fundamentals** — enough to be dangerous, not enough to be
+   fooled.
+4. **CI/CD as code** — GitHub Actions workflows that I'd actually want to inherit.
+
+More posts as things click.

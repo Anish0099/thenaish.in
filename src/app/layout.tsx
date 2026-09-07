@@ -4,6 +4,11 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  JsonLd,
+  personJsonLd,
+  websiteJsonLd,
+} from "@/components/json-ld";
 import { siteConfig } from "@/lib/site";
 
 const inter = Inter({
@@ -76,6 +81,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+        <JsonLd data={personJsonLd} />
+        <JsonLd data={websiteJsonLd} />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

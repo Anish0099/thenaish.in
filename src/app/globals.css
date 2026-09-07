@@ -64,6 +64,32 @@ body {
   color: hsl(var(--foreground));
 }
 
+/* MDX code blocks: shiki inline-styled tokens; strip inline-code chrome inside <pre> */
+pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: inherit !important;
+}
+
+.dark pre code span {
+  color: var(--shiki-dark) !important;
+}
+
+:root:not(.dark) pre code span {
+  color: var(--shiki-light) !important;
+}
+
+pre code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: hsl(var(--muted-foreground));
+}
+
 /* Subtle grid backdrop for hero */
 .bg-grid {
   background-image:
