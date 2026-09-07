@@ -20,7 +20,6 @@ export const apiVersion =
 export const isConfigured = projectId !== PLACEHOLDER_PROJECT_ID;
 
 if (!isConfigured && process.env.NODE_ENV !== "production") {
-  // eslint-disable-next-line no-console
   console.warn(
     "[sanity] NEXT_PUBLIC_SANITY_PROJECT_ID is not set — running with placeholder. See README.md."
   );

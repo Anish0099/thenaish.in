@@ -8,7 +8,12 @@ export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // Avoid a hydration mismatch on the icon: only trust the theme once
+    // the client has mounted. This is next-themes' recommended pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const current = mounted ? (resolvedTheme ?? theme) : undefined;
   const isDark = current === "dark";
